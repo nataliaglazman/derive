@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B&N: DERIVE PROJECT</title>
+
+    <!-- Leaflet CSS for the map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+                /* Custom slow zoom for hover animations */
+        .slow-zoom .leaflet-zoom-animated {
+            transition-duration: 1.5s !important;
+        }
+
+
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden;
+        }
+        
+        /* Map takes up the whole screen */
+        #map { 
+            width: 100%; 
+            height: 100%; 
+        }
+
+        /* The overlay that requires the user to click so audio can play */
+        #start-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* Stays on top of everything */
+        }
+
+        #start-btn {
+            padding: 20px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #0078A8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #start-btn:hover { background-color: #005a7f; }
+
+        /* The floating panel for the images */
+        #image-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            z-index: 1000; /* Stays on top of the map */
+            opacity: 0;
+            pointer-events: none; /* Let clicks pass through to the map */
+            transition: opacity 0.4s ease;
+            text-align: center;
+        }
+
+        #image-panel img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        #image-panel h2 {
+            margin: 0;
+            color: #333;
+        }
+                #random-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%); /* Centers the button perfectly */
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #0078A8;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000; /* Stays above the map */
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+         /* 1. Make the button container invisible */
+        #random-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0; /* Remove default padding so the click area perfectly matches the SVG */
+            
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+                /* Control the image inside the button */
+        #random-btn img {
+            transition: transform 0.2s ease, filter 0.2s ease;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4)); /* Adds a shadow */
+        }
+
+        /* Makes the image grow and become slightly brighter on hover */
+        #random-btn:hover img {
+            transform: scale(1.15); 
+            filter: drop-shadow(0px 6px 8px rgba(0,0,0,0.5)) brightness(1.2); 
+        }
+                #corner-logo {
+            position: absolute;
+            top: 10px;    /* Distance from the top of the screen */
+            left: 20px;   /* Distance from the left of the screen */
+            z-index: 1000; /* Stays above the map tiles */
+            
+            /* Optional: Add a subtle drop shadow to separate it from the map */
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.3));
+        }
+
+
+
+        
+    </style>
+</head>
+<body>
+    <!-- Corner Logo / SVG -->
+    <div id="corner-logo">
+        <!-- Option A: Link to a file -->
+        <img src="derive.svg" alt="Corner Graphic" width="250" height="250">
+        
+        <!-- Option B: Or paste raw <svg> ... </svg> code right here -->
+    </div>
+    <!-- Start Overlay -->
+    <div id="start-overlay">
+        <button id="start-btn">Click to Start Interactive Map</button>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Hover Info Panel -->
+    <div id="image-panel">
+        <h2 id="location-title">Location Name</h2>
+        <img id="location-image" src="" alt="Location Image">
+    </div>
+    <!-- ADD THIS NEW BUTTON -->
+    <!-- Replace the text button with an SVG button -->
+    <button id="random-btn" title="Take Me Somewhere Random">
+        
+        <!-- Paste your custom SVG code right here -->
+       <img src="drawing.svg" alt="Random Button" width="190" height="190">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        </svg>
+
+    </button>
+
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // 1. Remove the start overlay when clicked (unlocks audio)
+        document.getElementById('start-btn').addEventListener('click', function() {
+            document.getElementById('start-overlay').style.display = 'none';
+        });
+
+        // 2. Initialize the map centered on London
+        const defaultCenter = [51.505, -0.12];
+        const defaultZoom = 12;
+        const hoverZoom = 16;
+        
+        const map = L.map('map').setView(defaultCenter, defaultZoom);
+
+        // Load the CARTO Voyager tiles (friendly for local testing)
+        // Load Esri World Street Map tiles (No API key required, works perfectly for local files)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16, 
+            attribution: 'Tiles © Esri'
+        }).addTo(map);
+
+
+
+        // 3. Define your locations, images, and audio here!
+        const locations = [
+            {
+                name: "Ben's flat",
+                lat: 51.481726559335236,
+                lng: -0.12151946558093002,
+                // Replace these URLs with paths to your own local files, e.g., "music/tower.mp3"
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                image: "https://i.postimg.cc/BQ4rYyKK/360-F-662665020-Cy-Vsy-GUH5n-BJUNmoabu-XM1BJZ5WUSIUW.jpg"
+            },
+            {
+                name: "Site of the 'LATM' accident",
+                lat: 51.50593956691568,
+                lng: -0.12268025393587462,
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                image: "https://i.postimg.cc/y65c647w/B303DEC2-ECA5-4568-A336-860F0AD8049D-1-105-c.jpg"
+            },
+            {
+                name: "Old Habits Tattoo",
+                lat: 51.54053902859313,
+                lng: -0.07632860392741424,
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+                image: "https://i.postimg.cc/C12BKkVy/6F9BBA0E-07C9-4DB5-859A-157E966F6C3F-1-105-c.jpg"
+            }
+        ];
+
+        let currentAudio = null;
+        const imagePanel = document.getElementById('image-panel');
+        const locationTitle = document.getElementById('location-title');
+        const locationImage = document.getElementById('location-image');
+
+                let zoomTimeout; // Tracks the animation time
+                // Define your custom map pin image
+        const myCustomIcon = L.icon({
+            iconUrl: 'star.svg', // Replace with your image link
+            iconSize: [50, 50],     // The width and height of the image in pixels
+            iconAnchor: [20, 40],   // The exact point of the image that touches the map (bottom center)
+            popupAnchor: [0, -40]   // Where the popup should open relative to the pin
+        });
+
+        // 4. Create pins and hover effects
+        locations.forEach(loc => {
+                        // Change this line:
+            // const marker = L.marker([loc.lat, loc.lng]).addTo(map);
+            
+            // To this:
+            const marker = L.marker([loc.lat, loc.lng], { icon: myCustomIcon }).addTo(map);
+
+
+            // What happens when you hover OVER the pin
+            marker.on('mouseover', () => {
+                
+                // 1. Apply our custom slow-zoom CSS
+                document.getElementById('map').classList.add('slow-zoom');
+
+                // 2. Zoom in smoothly while keeping the pin perfectly under the mouse
+                map.setZoomAround([loc.lat, loc.lng], hoverZoom, { animate: true });
+
+                // 3. Remove the CSS class after 1.5s so regular map scrolling isn't ruined
+                clearTimeout(zoomTimeout);
+                zoomTimeout = setTimeout(() => {
+                    document.getElementById('map').classList.remove('slow-zoom');
+                }, 1500);
+
+                // Set up and show the image panel
+                locationTitle.textContent = loc.name;
+                locationImage.src = loc.image;
+                imagePanel.style.opacity = 1;
+
+                // Stop any currently playing audio and start the new one
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                currentAudio = new Audio(loc.audio);
+                currentAudio.play().catch(e => console.log("Audio requires user interaction first."));
+            });
+
+
+            // What happens when you move your mouse OFF the pin
+            marker.on('mouseout', () => {
+                
+                // Hide the image panel
+                imagePanel.style.opacity = 0;
+
+                // Stop the audio
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+
+                // Fly back to the whole view of London
+                map.flyTo(defaultCenter, defaultZoom, {
+                    animate: true,
+                    duration: 1.5
+                });
+            });
+        });
+                                // We need a variable to keep track of the random pin so we can delete it later
+        let currentRandomPin = null;
+
+
+        // 5. Random Coordinates Button Logic
+        document.getElementById('random-btn').addEventListener('click', () => {
+            
+            // If there's already a random pin on the map, remove it first
+            if (currentRandomPin) {
+                map.removeLayer(currentRandomPin);
+            }
+
+            // Approximate the M25 boundaries
+            const centerLat = 51.505;
+            const centerLng = -0.120;
+            const maxRadius = 0.22; 
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.sqrt(Math.random()) * maxRadius; 
+
+            const randomLat = (centerLat + distance * Math.cos(angle)).toFixed(4);
+            const randomLng = (centerLng + distance * Math.sin(angle) * 1.6).toFixed(4);
+
+            // Create the new pin using your custom icon (if you set one up)
+            currentRandomPin = L.marker([randomLat, randomLng]).addTo(map);
+
+            // Fly to it
+            map.flyTo([randomLat, randomLng], hoverZoom, {
+                animate: true,
+                duration: 1.5
+            });
+
+            // Bind the popup (Ensure closeButton: false is REMOVED so the 'X' shows up)
+            currentRandomPin.bindPopup(`
+                <strong>Random Discovery</strong><br>
+                Lat: ${randomLat}<br>
+                Lng: ${randomLng}
+            `, {
+                className: 'floating-text-popup',
+                offset: [0, -30] 
+            }).openPopup();
+
+            // ADDED: Delete the pin when the 'x' is clicked
+            currentRandomPin.on('popupclose', () => {
+                if (currentRandomPin) {
+                    map.removeLayer(currentRandomPin);
+                    currentRandomPin = null; 
+                }
+            });
+
+            // Hide the image panel and stop audio
+            imagePanel.style.opacity = 0;
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+        });
+
+
+    
+
+        // Click anywhere on the map to reset the view and hide panels
+        map.on('click', () => {
+             imagePanel.style.opacity = 0;
+             if (currentAudio) {
+                 currentAudio.pause();
+                 currentAudio.currentTime = 0;
+             }
+             map.flyTo(defaultCenter, defaultZoom, {
+                 animate: true,
+                 duration: 1.5
+             });
+        });
+    </script>
+</body>
+</html>
