@@ -195,7 +195,7 @@
 
     <!-- Leaflet JavaScript -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0sS/gpx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
 
     <script>
         // 1. Remove the start overlay when clicked (unlocks audio)
@@ -210,22 +210,22 @@
 
         const map = L.map('map').setView(defaultCenter, defaultZoom);
 
-        // Load the CARTO Voyager tiles (friendly for local testing)
-        // Load Esri World Street Map tiles (No API key required, works perfectly for local files)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 16,
-            attribution: 'Tiles © Esri'
+        
+        // Stadia Maps Alidade Smooth (Soft Light)
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=1bf3ab1a-b4c9-4760-8370-d3a1c2cbe472', {
+            maxZoom: 20,
+            attribution: '© Stadia Maps, © OpenMapTiles, © OpenStreetMap contributors'
         }).addTo(map);
 
 
 
         // 3. Define your locations, images, and audio here!
         const locations = [
+            // --- ORIGINAL LOCATIONS ---
             {
                 name: "Ben's flat",
                 lat: 51.481726559335236,
                 lng: -0.12151946558093002,
-                // Replace these URLs with paths to your own local files, e.g., "music/tower.mp3"
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
                 image: "https://i.postimg.cc/BQ4rYyKK/360-F-662665020-Cy-Vsy-GUH5n-BJUNmoabu-XM1BJZ5WUSIUW.jpg"
             },
@@ -242,6 +242,43 @@
                 lng: -0.07632860392741424,
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
                 image: "https://i.postimg.cc/C12BKkVy/6F9BBA0E-07C9-4DB5-859A-157E966F6C3F-1-105-c.jpg"
+            },
+            
+            // --- NEW LOCATIONS ---
+            {
+                name: "Natalia's Work",
+                lat: 51.499799355451984,
+                lng: -0.11616712991588761,
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3",
+                image: "https://i.postimg.cc/9XybMMwb/2.jpg" 
+            },
+            {
+                name: "Bens work",
+                lat: 51.52098215713204,
+                lng: -0.10177203697336816,
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+                image: "https://i.postimg.cc/Df16ZZ4j/3.jpg" 
+            },
+            {
+                name: "Haggerston Park, Doms Subs",
+                lat: 51.534377980410895,
+                lng: -0.06931715609614852,
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+                image: "https://i.postimg.cc/NjbBwBxv/image-1.jpg" 
+            },
+            {
+                name: "Natalia's House",
+                lat: 51.4705230902746,
+                lng: -0.04353143793877728,
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+                image: "https://i.postimg.cc/NGRDMM2N/Whats-App-Image-2026-09-30-at-23-04-55.jpg" 
+            },
+            {
+                name: "Our Spot",
+                lat: 51.52057728063879,
+                lng: -0.09589475851021564,
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3",
+                image: "https://i.postimg.cc/c1fhHHtk/5.jpg" 
             }
         ];
 
@@ -265,7 +302,7 @@
             // const marker = L.marker([loc.lat, loc.lng]).addTo(map);
 
             // To this:
-            const marker = L.marker([loc.lat, loc.lng], {icon: myCustomIcon}).addTo(map);
+            const marker = L.marker([loc.lat, loc.lng], { icon: myCustomIcon }).addTo(map);
 
 
             // What happens when you hover OVER the pin
@@ -275,7 +312,7 @@
                 document.getElementById('map').classList.add('slow-zoom');
 
                 // 2. Zoom in smoothly while keeping the pin perfectly under the mouse
-                map.setZoomAround([loc.lat, loc.lng], hoverZoom, {animate: true});
+                map.setZoomAround([loc.lat, loc.lng], hoverZoom, { animate: true });
 
                 // 3. Remove the CSS class after 1.5s so regular map scrolling isn't ruined
                 clearTimeout(zoomTimeout);
@@ -393,7 +430,7 @@
         const gpxRoute = new L.GPX('BensCommutev1.gpx', {
             async: true,
             polyline_options: {
-                color: '0078A8',
+                color: '#0078A8',
                 weight: 3,
                 opacity: 0.85,
                 lineCap: 'round'
