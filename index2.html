@@ -5,14 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B&N: DERIVE PROJECT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
-        rel="stylesheet">
 
     <!-- 1. ADDED PRECONNECTS: Forces the browser to load the font instantly -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
         rel="stylesheet">
+
+    <!-- SunCalc Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
 
     <!-- Leaflet CSS for the map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -25,6 +26,8 @@
             height: 100%;
             font-family: 'Roboto Mono', monospace;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Map takes up the whole screen */
@@ -45,7 +48,6 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            /* Stays on top of everything */
         }
 
         #start-btn {
@@ -76,10 +78,8 @@
             border-radius: 12px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             z-index: 1000;
-            /* Stays on top of the map */
             opacity: 0;
             pointer-events: none;
-            /* Let clicks pass through to the map */
             transition: opacity 0.4s ease;
             text-align: center;
         }
@@ -108,52 +108,25 @@
             font-family: 'Roboto Mono', monospace;
         }
 
-        #random-btn {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            /* Centers the button perfectly */
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            font-family: 'Roboto Mono', monospace;
-            background-color: #0078A8;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            z-index: 1000;
-            /* Stays above the map */
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
         /* 1. Make the button container invisible */
         #random-btn {
             position: absolute;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-
             background: transparent;
             border: none;
             box-shadow: none;
             padding: 0;
-            /* Remove default padding so the click area perfectly matches the SVG */
-
             cursor: pointer;
             z-index: 1000;
         }
 
-        /* Control the image inside the button */
         #random-btn img {
             transition: transform 0.2s ease, filter 0.2s ease;
             filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.4));
-            /* Adds a shadow */
         }
 
-        /* Makes the image grow and become slightly brighter on hover */
         #random-btn:hover img {
             transform: scale(1.15);
             filter: drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.5)) brightness(1.2);
@@ -162,13 +135,8 @@
         #corner-logo {
             position: absolute;
             top: 10px;
-            /* Distance from the top of the screen */
             left: 20px;
-            /* Distance from the left of the screen */
             z-index: 1000;
-            /* Stays above the map tiles */
-
-            /* Optional: Add a subtle drop shadow to separate it from the map */
             filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
         }
 
@@ -184,7 +152,8 @@
             filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
         }
 
-        #reveal-routes-btn img {
+        #reveal-routes-btn img,
+        #reveal-locations-btn img {
             display: block;
             width: 190px;
             height: 190px;
@@ -214,30 +183,146 @@
             filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
         }
 
-        #reveal-locations-btn img {
+       /* Sky Dome CSS */
+        #sky-dome {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1400px; /* INCREASED FROM 800px */
+            height: 1400px; /* INCREASED FROM 800px */
+            z-index: 1500; 
+            pointer-events: none; 
+            display: none; 
+            border-radius: 50%;
+        }
+
+        #dome-graphic {
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+            color: transparent; 
+        }
+
+        /* The line shooting out from the center */
+        #celestial-pointer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 3px; 
+            height: 60%; /* INCREASED to 60% so it runs past the compass arc */
+            background-color: transparent; 
+            transform-origin: bottom center; 
+            transform: translate(-50%, -100%) rotate(0deg);
+            display: none;
+        }
+
+        /* The little dot at the center point */
+        #celestial-pointer::after {
+            content: '';
+            position: absolute;
+            bottom: 0; /* Pins the dot to the exact center origin of the compass */
+            left: 50%;
+            transform: translate(-50%, 50%);
+            width: 12px; /* Adjust this to make the dot bigger or smaller */
+            height: 12px;
+            background-color: inherit; /* Automatically turns Gold for Sun, Silver for Moon! */
+            border-radius: 50%;
+        }
+        /* Sun and Moon Button Containers */
+        #toggle-sun-btn, #toggle-moon-btn {
+            position: absolute;
+            right: 20px; 
+            z-index: 1000;
+            padding: 0;
+            border: none;
+            background: transparent !important;
+            cursor: pointer;
+            
+        }
+
+        #toggle-sun-btn { top: 20px; }
+        #toggle-moon-btn { top: 160px; } /* Pushed down to fit the big sun */
+
+        /* BIG Sun Image */
+        #toggle-sun-btn img {
             display: block;
-            width: 190px;
-            height: 190px;
+            width: 130px;
+            height: 130px;
+            background: transparent !important;
             transition: transform 0.2s ease, filter 0.2s ease;
         }
+
+        /* REGULAR Moon Image */
+        #toggle-moon-btn img {
+            display: block;
+            width: 90px;
+            height: 90px;
+            background: transparent !important;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        /* Hover Effects */
+        #toggle-sun-btn:hover img, #toggle-moon-btn:hover img {
+            transform: scale(1.15);
+            filter: brightness(1.2);
+        }
+
+        /* Minimal Altitude Readout styling */
+        .alt-readout {
+            position: absolute;
+            right: 150px; /* Puts the text just to the left of the buttons */
+            color: black !important; /* Made the text black */
+            background: transparent; /* Removed the background */
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px; /* Made the text smaller */
+            font-weight: bold;
+            z-index: 1000;
+            display: none; /* Hidden until clicked */
+            pointer-events: none;
+        }
+
+        /* Vertically center the text next to each specific button */
+        #sun-alt { top: 45px; } 
+        #moon-alt { top: 155px; }
     </style>
 </head>
 
 <body>
     <!-- Corner Logo / SVG -->
     <div id="corner-logo">
-        <!-- Option A: Link to a file -->
         <img src="derive.svg" alt="Corner Graphic" width="250" height="250">
-
-        <!-- Option B: Or paste raw <svg> ... </svg> code right here -->
     </div>
+
     <!-- Start Overlay -->
     <div id="start-overlay">
         <button id="start-btn">I want to dérive!</button>
     </div>
 
+    <!-- Sky Dome HUD (Centered on screen) -->
+    <div id="sky-dome">
+        <img id="dome-graphic" src="" alt="Sky Paths" style="display: none;">
+        <div id="celestial-pointer"></div>
+    </div>
+    
+    <!-- Minimal Altitude Readouts -->
+    <div id="sun-alt" class="alt-readout"></div>
+    <div id="moon-alt" class="alt-readout"></div>
+
+    <!-- NEW: Live test data readout (Moved outside the dome, styled by CSS) -->
+    <div id="celestial-info"></div>
+
     <!-- Map Container -->
     <div id="map"></div>
+
+    <!-- Temporary Test Buttons for Sun and Moon -->
+    <!-- Sun and Moon Buttons -->
+    <button id="toggle-sun-btn" type="button" aria-label="Toggle Sun Path">
+        <img src="sun.svg" alt="">
+    </button>
+    <button id="toggle-moon-btn" type="button" aria-label="Toggle Moon Path">
+        <img src="moon.svg" alt="">
+    </button>
     <button id="reveal-routes-btn" type="button" aria-label="Reveal Routes" disabled>
         <img src="revealroutes.svg" alt="Reveal Routes">
     </button>
@@ -250,54 +335,35 @@
         <h2 id="location-title">Location Name</h2>
         <img id="location-image" src="" alt="Location Image">
     </div>
-    <!-- ADD THIS NEW BUTTON -->
-    <!-- Replace the text button with an SVG button -->
+
+    <!-- Random Button -->
     <button id="random-btn" title="Take Me Somewhere Random">
-
-        <!-- Paste your custom SVG code right here -->
         <img src="drawing.svg" alt="Random Button" width="190" height="190">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-        </svg>
-
     </button>
-
 
     <!-- Leaflet JavaScript -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
 
     <script>
-        // 1. Remove the start overlay when clicked (unlocks audio)
         document.getElementById('start-btn').addEventListener('click', function () {
             document.getElementById('start-overlay').style.display = 'none';
         });
 
-        // 2. Initialize the map centered on London
-        // 2. Initialize the map centered on London (WITH CUSTOM RENDERER)
         const defaultCenter = [51.505, -0.12];
         const defaultZoom = 12;
         const hoverZoom = 16;
 
-        // The padding: 100 ensures the line is never cut off by screen boundaries
         const map = L.map('map', {
             renderer: L.svg({ padding: 100 })
         }).setView(defaultCenter, defaultZoom);
 
-
-
-        // Stadia Maps Alidade Smooth (Soft Light)
         L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=1bf3ab1a-b4c9-4760-8370-d3a1c2cbe472', {
             maxZoom: 20,
             attribution: '© Stadia Maps, © OpenMapTiles, © OpenStreetMap contributors'
         }).addTo(map);
 
-
-
-
-        // 3. Define your locations, images, and audio here!
         const locations = [
-            // --- ORIGINAL LOCATIONS ---
             {
                 name: "Ben's flat",
                 lat: 51.481726559335236,
@@ -319,8 +385,6 @@
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
                 image: "https://i.postimg.cc/C12BKkVy/6F9BBA0E-07C9-4DB5-859A-157E966F6C3F-1-105-c.jpg"
             },
-
-            // --- NEW LOCATIONS ---
             {
                 name: "Natalia's Work",
                 lat: 51.499799355451984,
@@ -363,12 +427,11 @@
         const locationTitle = document.getElementById('location-title');
         const locationImage = document.getElementById('location-image');
 
-        // Define your custom map pin image
         const myCustomIcon = L.icon({
-            iconUrl: 'star.svg', // Replace with your image link
-            iconSize: [50, 50],     // The width and height of the image in pixels
-            iconAnchor: [20, 40],   // The exact point of the image that touches the map (bottom center)
-            popupAnchor: [0, -40]   // Where the popup should open relative to the pin
+            iconUrl: 'star.svg',
+            iconSize: [50, 50],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40]
         });
         const discoveryIcon = L.icon({
             iconUrl: 'star_blue.svg',
@@ -379,12 +442,7 @@
 
         const locationMarkers = [];
 
-        // 4. Create pins and marker interactions
         locations.forEach(loc => {
-            // Change this line:
-            // const marker = L.marker([loc.lat, loc.lng]).addTo(map);
-
-            // To this:
             const marker = L.marker([loc.lat, loc.lng], { icon: myCustomIcon }).addTo(map);
             marker.getElement().style.transition = 'opacity 1s ease';
             marker.getElement().style.opacity = '0';
@@ -398,18 +456,14 @@
 
             marker.on('click', (event) => {
                 L.DomEvent.stopPropagation(event.originalEvent);
-
                 map.flyTo([loc.lat, loc.lng], hoverZoom, {
                     animate: true,
                     duration: 1.5
                 });
-
-                // Set up and show the image panel
                 locationTitle.textContent = loc.name;
                 locationImage.src = loc.image;
                 imagePanel.style.opacity = 1;
 
-                // Stop any currently playing audio and start the new one
                 if (currentAudio) {
                     currentAudio.pause();
                     currentAudio.currentTime = 0;
@@ -444,19 +498,13 @@
             }
         });
 
-        // We need a variable to keep track of the random pin so we can delete it later
         let currentRandomPin = null;
 
-
-        // 5. Random Coordinates Button Logic
         document.getElementById('random-btn').addEventListener('click', () => {
-
-            // If there's already a random pin on the map, remove it first
             if (currentRandomPin) {
                 map.removeLayer(currentRandomPin);
             }
 
-            // Approximate the M25 boundaries
             const centerLat = 51.505;
             const centerLng = -0.120;
             const maxRadius = 0.1;
@@ -466,16 +514,13 @@
             const randomLat = (centerLat + distance * Math.cos(angle)).toFixed(4);
             const randomLng = (centerLng + distance * Math.sin(angle) * 1.6).toFixed(4);
 
-            // Create the new pin using your custom icon (if you set one up)
             currentRandomPin = L.marker([randomLat, randomLng], { icon: discoveryIcon }).addTo(map);
 
-            // Fly to it
             map.flyTo([randomLat, randomLng], hoverZoom, {
                 animate: true,
                 duration: 3
             });
 
-            // Bind the popup (Ensure closeButton: false is REMOVED so the 'X' shows up)
             currentRandomPin.bindPopup(`
                 <strong>Random Discovery</strong><br>
                 Lat: ${randomLat}<br>
@@ -485,7 +530,6 @@
                 offset: [0, -30]
             }).openPopup();
 
-            // ADDED: Delete the pin when the 'x' is clicked
             currentRandomPin.on('popupclose', () => {
                 if (currentRandomPin) {
                     map.removeLayer(currentRandomPin);
@@ -493,7 +537,6 @@
                 }
             });
 
-            // Hide the image panel and stop audio
             imagePanel.style.opacity = 0;
             if (currentAudio) {
                 currentAudio.pause();
@@ -501,10 +544,6 @@
             }
         });
 
-
-
-
-        // Click anywhere on the map to reset the view and hide panels
         map.on('click', () => {
             imagePanel.style.opacity = 0;
             if (currentAudio) {
@@ -516,7 +555,7 @@
                 duration: 3
             });
         });
-        // Load and display a Strava GPX track
+
         const gpxRoute = new L.GPX('BensCommutev1.gpx', {
             async: true,
             polyline_options: {
@@ -546,7 +585,6 @@
             if (routesRevealed) {
                 routeMarkers.forEach(marker => marker.style.opacity = '1');
                 routePaths.forEach(routePath => {
-                    // Apply the staggered forward animation
                     routePath.style.transition = routePath.dataset.drawTransition;
                     routePath.style.opacity = '0.85';
                     routePath.style.strokeDashoffset = '0';
@@ -554,7 +592,6 @@
             } else {
                 routeMarkers.forEach(marker => marker.style.opacity = '0');
                 routePaths.forEach(routePath => {
-                    // Apply a faster, uniform reverse animation to hide it
                     routePath.style.transition = routePath.dataset.hideTransition;
                     routePath.style.strokeDashoffset = routePath.dataset.totalLength;
                     routePath.style.opacity = '0';
@@ -563,8 +600,6 @@
         });
 
         gpxRoute.on('loaded', function (e) {
-            // Disable animation on the initial zoom. If the map is zooming while the browser
-            // calculates the SVG pixel lengths, the measurements will be wrong!
             map.fitBounds(e.target.getBounds(), { animate: false });
 
             requestAnimationFrame(() => {
@@ -576,14 +611,13 @@
 
                 routePaths = [...document.querySelectorAll('.leaflet-overlay-pane path')];
 
-                // 1. Find the total length of ALL segments combined
                 let totalRouteLength = 0;
                 routePaths.forEach(routePath => {
                     totalRouteLength += routePath.getTotalLength();
                 });
 
-                const TOTAL_ANIMATION_TIME = 3; // Total seconds to draw the whole route
-                let accumulatedDelay = 0;       // Keeps track of when the next segment should start
+                const TOTAL_ANIMATION_TIME = 3;
+                let accumulatedDelay = 0;
 
                 routePaths.forEach(routePath => {
                     const routeLength = routePath.getTotalLength();
@@ -593,17 +627,11 @@
                     routePath.style.strokeDashoffset = routeLength;
                     routePath.style.opacity = '0';
 
-                    // 2. Calculate how long THIS segment should take based on its size
                     const segmentDuration = (routeLength / totalRouteLength) * TOTAL_ANIMATION_TIME;
 
-                    // 3. Store the transition string using 'linear' speed so the segments 
-                    // connect flawlessly without accelerating/decelerating at the joints
                     routePath.dataset.drawTransition = `stroke-dashoffset ${segmentDuration}s linear ${accumulatedDelay}s, opacity 0.2s ease`;
-
-                    // A quick 1-second transition for when you close the route
                     routePath.dataset.hideTransition = `stroke-dashoffset 1s ease 0s, opacity 1s ease`;
 
-                    // Add this segment's time to the delay for the next segment
                     accumulatedDelay += segmentDuration;
                 });
 
@@ -611,8 +639,85 @@
             });
         });
 
+        // --- SUN & MOON MATH LOGIC ---
+        const skyDome = document.getElementById('sky-dome');
+        const domeGraphic = document.getElementById('dome-graphic');
+        const celestialPointer = document.getElementById('celestial-pointer');
+        const sunAltBox = document.getElementById('sun-alt');
+        const moonAltBox = document.getElementById('moon-alt');
 
+        const londonLat = 51.505;
+        const londonLng = -0.120;
+        const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
+        let sunActive = false;
+        let moonActive = false;
+
+        document.getElementById('toggle-sun-btn').addEventListener('click', () => {
+            sunActive = !sunActive; // Toggle the state (On/Off)
+            
+            if (sunActive) {
+                // If turning Sun ON, force Moon OFF so they don't overlap
+                moonActive = false;
+                moonAltBox.style.display = 'none';
+
+                const now = new Date();
+                const currentMonthName = monthNames[now.getMonth()]; 
+                
+                domeGraphic.src = `sun-paths-${currentMonthName}.svg`; 
+                domeGraphic.style.display = 'block';
+
+                const sunPos = SunCalc.getPosition(now, londonLat, londonLng);
+                const compassAngle = (sunPos.azimuth * 180 / Math.PI) + 180; 
+                const altitudeDegrees = (sunPos.altitude * 180 / Math.PI).toFixed(1); 
+
+                skyDome.style.display = 'block';
+                celestialPointer.style.display = 'block';
+                celestialPointer.style.backgroundColor = '#FFD700';
+                celestialPointer.style.transform = `translate(-50%, -100%) rotate(${compassAngle}deg)`;
+                
+                // Show ONLY the number and degree symbol next to the button
+                sunAltBox.innerHTML = `${altitudeDegrees}&deg;`;
+                sunAltBox.style.display = 'block';
+            } else {
+                // If turning Sun OFF, hide everything
+                skyDome.style.display = 'none';
+                sunAltBox.style.display = 'none';
+            }
+        });
+
+        document.getElementById('toggle-moon-btn').addEventListener('click', () => {
+            moonActive = !moonActive; // Toggle the state (On/Off)
+            
+            if (moonActive) {
+                // If turning Moon ON, force Sun OFF
+                sunActive = false;
+                sunAltBox.style.display = 'none';
+
+                const now = new Date();
+                const currentMonthName = monthNames[now.getMonth()]; 
+                
+                domeGraphic.src = `moon-paths-${currentMonthName}.svg`;
+                domeGraphic.style.display = 'block';
+
+                const moonPos = SunCalc.getMoonPosition(now, londonLat, londonLng);
+                const compassAngle = (moonPos.azimuth * 180 / Math.PI) + 180;
+                const altitudeDegrees = (moonPos.altitude * 180 / Math.PI).toFixed(1);
+
+                skyDome.style.display = 'block';
+                celestialPointer.style.display = 'block';
+                celestialPointer.style.backgroundColor = '#C0C0C0';
+                celestialPointer.style.transform = `translate(-50%, -100%) rotate(${compassAngle}deg)`;
+                
+                // Show ONLY the number and degree symbol next to the button
+                moonAltBox.innerHTML = `${altitudeDegrees}&deg;`;
+                moonAltBox.style.display = 'block';
+            } else {
+                // If turning Moon OFF, hide everything
+                skyDome.style.display = 'none';
+                moonAltBox.style.display = 'none';
+            }
+        });
     </script>
 </body>
 
