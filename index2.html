@@ -5,24 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B&N: DERIVE PROJECT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 
     <!-- Leaflet CSS for the map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
-        /* Custom slow zoom for hover animations */
-        .slow-zoom .leaflet-zoom-animated {
-            transition-duration: 3s !important;
-            transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
-        }
-
-
         body,
         html {
             margin: 0;
             padding: 0;
             height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto Mono', monospace;
             overflow: hidden;
         }
 
@@ -51,7 +45,8 @@
             padding: 20px 40px;
             font-size: 24px;
             font-weight: bold;
-            background-color: #0078A8;
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0000ff;
             color: white;
             border: none;
             border-radius: 8px;
@@ -60,7 +55,7 @@
         }
 
         #start-btn:hover {
-            background-color: #005a7f;
+            background-color: #0000ff;
         }
 
         /* The floating panel for the images */
@@ -95,6 +90,17 @@
             color: #333;
         }
 
+        .location-tooltip {
+            border: 0;
+            border-radius: 4px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 9px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
         #random-btn {
             position: absolute;
             bottom: 30px;
@@ -104,6 +110,7 @@
             padding: 15px 30px;
             font-size: 18px;
             font-weight: bold;
+            font-family: 'Roboto Mono', monospace;
             background-color: #0078A8;
             color: white;
             border: none;
@@ -349,7 +356,6 @@
         const locationTitle = document.getElementById('location-title');
         const locationImage = document.getElementById('location-image');
 
-        let zoomTimeout; // Tracks the animation time
         // Define your custom map pin image
         const myCustomIcon = L.icon({
             iconUrl: 'star.svg', // Replace with your image link
@@ -366,7 +372,7 @@
 
         const locationMarkers = [];
 
-        // 4. Create pins and hover effects
+        // 4. Create pins and marker interactions
         locations.forEach(loc => {
             // Change this line:
             // const marker = L.marker([loc.lat, loc.lng]).addTo(map);
@@ -374,26 +380,22 @@
             // To this:
             const marker = L.marker([loc.lat, loc.lng], { icon: myCustomIcon }).addTo(map);
             marker.getElement().style.transition = 'opacity 1s ease';
+            marker.getElement().style.opacity = '0';
+            marker.getElement().style.pointerEvents = 'none';
+            marker.bindTooltip(loc.name, {
+                className: 'location-tooltip',
+                direction: 'top',
+                offset: [0, -35]
+            });
             locationMarkers.push(marker);
 
+            marker.on('click', (event) => {
+                L.DomEvent.stopPropagation(event.originalEvent);
 
-            // What happens when you hover OVER the pin
-            marker.on('mouseover', () => {
-                if (!locationsVisible) {
-                    return;
-                }
-
-                // 1. Apply our custom slow-zoom CSS
-                document.getElementById('map').classList.add('slow-zoom');
-
-                // 2. Zoom in smoothly while keeping the pin perfectly under the mouse
-                map.setZoomAround([loc.lat, loc.lng], hoverZoom, { animate: true });
-
-                // 3. Remove the CSS class after the animation so regular map scrolling isn't slowed
-                clearTimeout(zoomTimeout);
-                zoomTimeout = setTimeout(() => {
-                    document.getElementById('map').classList.remove('slow-zoom');
-                }, 3000);
+                map.flyTo([loc.lat, loc.lng], hoverZoom, {
+                    animate: true,
+                    duration: 1.5
+                });
 
                 // Set up and show the image panel
                 locationTitle.textContent = loc.name;
@@ -408,32 +410,9 @@
                 currentAudio = new Audio(loc.audio);
                 currentAudio.play().catch(e => console.log("Audio requires user interaction first."));
             });
-
-
-            // What happens when you move your mouse OFF the pin
-            marker.on('mouseout', () => {
-                if (!locationsVisible) {
-                    return;
-                }
-
-                // Hide the image panel
-                imagePanel.style.opacity = 0;
-
-                // Stop the audio
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                }
-
-                // Fly back to the whole view of London
-                map.flyTo(defaultCenter, defaultZoom, {
-                    animate: true,
-                    duration: 3
-                });
-            });
         });
 
-        let locationsVisible = true;
+        let locationsVisible = false;
         document.getElementById('reveal-locations-btn').addEventListener('click', () => {
             locationsVisible = !locationsVisible;
             const locationsButton = document.getElementById('reveal-locations-btn');
