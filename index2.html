@@ -5,7 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B&N: DERIVE PROJECT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+
+    <!-- 1. ADDED PRECONNECTS: Forces the browser to load the font instantly -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
 
     <!-- Leaflet CSS for the map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -267,24 +274,24 @@
         });
 
         // 2. Initialize the map centered on London
-                // 2. Initialize the map centered on London (WITH CUSTOM RENDERER)
+        // 2. Initialize the map centered on London (WITH CUSTOM RENDERER)
         const defaultCenter = [51.505, -0.12];
         const defaultZoom = 12;
         const hoverZoom = 16;
 
         // The padding: 100 ensures the line is never cut off by screen boundaries
-        const map = L.map('map', { 
-            renderer: L.svg({ padding: 100 }) 
+        const map = L.map('map', {
+            renderer: L.svg({ padding: 100 })
         }).setView(defaultCenter, defaultZoom);
 
 
-        
+
         // Stadia Maps Alidade Smooth (Soft Light)
         L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=1bf3ab1a-b4c9-4760-8370-d3a1c2cbe472', {
             maxZoom: 20,
             attribution: '© Stadia Maps, © OpenMapTiles, © OpenStreetMap contributors'
         }).addTo(map);
-        
+
 
 
 
@@ -312,42 +319,42 @@
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
                 image: "https://i.postimg.cc/C12BKkVy/6F9BBA0E-07C9-4DB5-859A-157E966F6C3F-1-105-c.jpg"
             },
-            
+
             // --- NEW LOCATIONS ---
             {
                 name: "Natalia's Work",
                 lat: 51.499799355451984,
                 lng: -0.11616712991588761,
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3",
-                image: "https://i.postimg.cc/9XybMMwb/2.jpg" 
+                image: "https://i.postimg.cc/9XybMMwb/2.jpg"
             },
             {
                 name: "Bens work",
                 lat: 51.52098215713204,
                 lng: -0.10177203697336816,
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
-                image: "https://i.postimg.cc/Df16ZZ4j/3.jpg" 
+                image: "https://i.postimg.cc/Df16ZZ4j/3.jpg"
             },
             {
                 name: "Haggerston Park, Doms Subs",
                 lat: 51.534377980410895,
                 lng: -0.06931715609614852,
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
-                image: "https://i.postimg.cc/NjbBwBxv/image-1.jpg" 
+                image: "https://i.postimg.cc/NjbBwBxv/image-1.jpg"
             },
             {
                 name: "Natalia's House",
                 lat: 51.4705230902746,
                 lng: -0.04353143793877728,
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-                image: "https://i.postimg.cc/NGRDMM2N/Whats-App-Image-2026-09-30-at-23-04-55.jpg" 
+                image: "https://i.postimg.cc/NGRDMM2N/Whats-App-Image-2026-09-30-at-23-04-55.jpg"
             },
             {
                 name: "Our Spot",
                 lat: 51.52057728063879,
                 lng: -0.09589475851021564,
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3",
-                image: "https://i.postimg.cc/c1fhHHtk/5.jpg" 
+                image: "https://i.postimg.cc/c1fhHHtk/5.jpg"
             }
         ];
 
@@ -527,7 +534,7 @@
             }
         }).addTo(map);
 
-                const revealRoutesButton = document.getElementById('reveal-routes-btn');
+        const revealRoutesButton = document.getElementById('reveal-routes-btn');
         let routePaths = [];
         let routeMarkers = [];
         let routesRevealed = false;
@@ -542,14 +549,14 @@
                     // Apply the staggered forward animation
                     routePath.style.transition = routePath.dataset.drawTransition;
                     routePath.style.opacity = '0.85';
-                    routePath.style.strokeDashoffset = '0'; 
+                    routePath.style.strokeDashoffset = '0';
                 });
             } else {
                 routeMarkers.forEach(marker => marker.style.opacity = '0');
                 routePaths.forEach(routePath => {
                     // Apply a faster, uniform reverse animation to hide it
                     routePath.style.transition = routePath.dataset.hideTransition;
-                    routePath.style.strokeDashoffset = routePath.dataset.totalLength; 
+                    routePath.style.strokeDashoffset = routePath.dataset.totalLength;
                     routePath.style.opacity = '0';
                 });
             }
@@ -568,7 +575,7 @@
                 });
 
                 routePaths = [...document.querySelectorAll('.leaflet-overlay-pane path')];
-                
+
                 // 1. Find the total length of ALL segments combined
                 let totalRouteLength = 0;
                 routePaths.forEach(routePath => {
@@ -581,18 +588,18 @@
                 routePaths.forEach(routePath => {
                     const routeLength = routePath.getTotalLength();
                     routePath.dataset.totalLength = routeLength;
-                    
+
                     routePath.style.strokeDasharray = routeLength;
                     routePath.style.strokeDashoffset = routeLength;
                     routePath.style.opacity = '0';
 
                     // 2. Calculate how long THIS segment should take based on its size
                     const segmentDuration = (routeLength / totalRouteLength) * TOTAL_ANIMATION_TIME;
-                    
+
                     // 3. Store the transition string using 'linear' speed so the segments 
                     // connect flawlessly without accelerating/decelerating at the joints
                     routePath.dataset.drawTransition = `stroke-dashoffset ${segmentDuration}s linear ${accumulatedDelay}s, opacity 0.2s ease`;
-                    
+
                     // A quick 1-second transition for when you close the route
                     routePath.dataset.hideTransition = `stroke-dashoffset 1s ease 0s, opacity 1s ease`;
 
