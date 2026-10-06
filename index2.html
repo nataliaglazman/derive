@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B&N: DERIVE PROJECT</title>
 
-    <!-- 1. ADDED PRECONNECTS: Forces the browser to load the font instantly -->
+    <!-- Preconnects: Forces the browser to load the font instantly -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
@@ -71,7 +71,7 @@
         #image-panel {
             position: absolute;
             top: 20px;
-            right: 20px;
+            left: 20px;
             width: 350px;
             background: rgba(255, 255, 255, 0.95);
             padding: 20px;
@@ -108,7 +108,7 @@
             font-family: 'Roboto Mono', monospace;
         }
 
-        /* 1. Make the button container invisible */
+        /* Random Button styling */
         #random-btn {
             position: absolute;
             bottom: 30px;
@@ -132,6 +132,65 @@
             filter: drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.5)) brightness(1.2);
         }
 
+       /* Radius UI Container (Increased Size) */
+        #radius-ui {
+            position: absolute;
+            bottom: 230px; 
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 480px;  /* Increased from 250px to make the graphic wider */
+            height: 280px; /* Increased from 120px to make the graphic taller */
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+
+        .radius-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .radius-input-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* We removed position: relative; so flexbox can't squish it! */
+        }
+
+        /* The transparent input with NO bottom line */
+        #radius-input {
+            position: absolute;
+            left: 160px;   /* INCREASE this to move the number to the RIGHT */
+            bottom: 140px; /* INCREASE this to move the number UP */
+            width: 90px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 30px; 
+            font-weight: bold;
+            text-align: center;
+            outline: none;
+        }
+
+        /* Hides the up/down arrows inside the number input */
+        #radius-input::-webkit-outer-spin-button,
+        #radius-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        #radius-input[type=number] {
+            -moz-appearance: textfield;
+        }
         #corner-logo {
             position: absolute;
             top: 10px;
@@ -140,10 +199,23 @@
             filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
         }
 
+        /* Bottom Reveal Buttons */
         #reveal-routes-btn {
             position: absolute;
             bottom: 30px;
             right: 20px;
+            z-index: 1000;
+            padding: 0;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        #reveal-locations-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
             z-index: 1000;
             padding: 0;
             border: none;
@@ -171,26 +243,14 @@
             opacity: 0.65;
         }
 
-        #reveal-locations-btn {
-            position: absolute;
-            bottom: 30px;
-            left: 20px;
-            z-index: 1000;
-            padding: 0;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
-        }
-
        /* Sky Dome CSS */
         #sky-dome {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 1400px; /* INCREASED FROM 800px */
-            height: 1400px; /* INCREASED FROM 800px */
+            width: 1400px; 
+            height: 1400px; 
             z-index: 1500; 
             pointer-events: none; 
             display: none; 
@@ -210,7 +270,7 @@
             top: 50%;
             left: 50%;
             width: 3px; 
-            height: 60%; /* INCREASED to 60% so it runs past the compass arc */
+            height: 60%; 
             background-color: transparent; 
             transform-origin: bottom center; 
             transform: translate(-50%, -100%) rotate(0deg);
@@ -221,14 +281,15 @@
         #celestial-pointer::after {
             content: '';
             position: absolute;
-            bottom: 0; /* Pins the dot to the exact center origin of the compass */
+            bottom: 0; 
             left: 50%;
             transform: translate(-50%, 50%);
-            width: 12px; /* Adjust this to make the dot bigger or smaller */
+            width: 12px; 
             height: 12px;
-            background-color: inherit; /* Automatically turns Gold for Sun, Silver for Moon! */
+            background-color: inherit; 
             border-radius: 50%;
         }
+
         /* Sun and Moon Button Containers */
         #toggle-sun-btn, #toggle-moon-btn {
             position: absolute;
@@ -238,11 +299,11 @@
             border: none;
             background: transparent !important;
             cursor: pointer;
-            
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
         }
 
         #toggle-sun-btn { top: 20px; }
-        #toggle-moon-btn { top: 160px; } /* Pushed down to fit the big sun */
+        #toggle-moon-btn { top: 160px; } 
 
         /* BIG Sun Image */
         #toggle-sun-btn img {
@@ -271,20 +332,19 @@
         /* Minimal Altitude Readout styling */
         .alt-readout {
             position: absolute;
-            right: 150px; /* Puts the text just to the left of the buttons */
-            color: black !important; /* Made the text black */
-            background: transparent; /* Removed the background */
+            right: 150px; 
+            color: black !important; 
+            background: transparent; 
             font-family: 'Roboto Mono', monospace;
-            font-size: 14px; /* Made the text smaller */
+            font-size: 14px; 
             font-weight: bold;
             z-index: 1000;
-            display: none; /* Hidden until clicked */
+            display: none; 
             pointer-events: none;
         }
 
-        /* Vertically center the text next to each specific button */
-        #sun-alt { top: 45px; } 
-        #moon-alt { top: 155px; }
+        #sun-alt { top: 70px; } 
+        #moon-alt { top: 195px; }
     </style>
 </head>
 
@@ -309,13 +369,9 @@
     <div id="sun-alt" class="alt-readout"></div>
     <div id="moon-alt" class="alt-readout"></div>
 
-    <!-- NEW: Live test data readout (Moved outside the dome, styled by CSS) -->
-    <div id="celestial-info"></div>
-
     <!-- Map Container -->
     <div id="map"></div>
 
-    <!-- Temporary Test Buttons for Sun and Moon -->
     <!-- Sun and Moon Buttons -->
     <button id="toggle-sun-btn" type="button" aria-label="Toggle Sun Path">
         <img src="sun.svg" alt="">
@@ -323,6 +379,8 @@
     <button id="toggle-moon-btn" type="button" aria-label="Toggle Moon Path">
         <img src="moon.svg" alt="">
     </button>
+    
+    <!-- Bottom Reveal Buttons -->
     <button id="reveal-routes-btn" type="button" aria-label="Reveal Routes" disabled>
         <img src="revealroutes.svg" alt="Reveal Routes">
     </button>
@@ -334,6 +392,14 @@
     <div id="image-panel">
         <h2 id="location-title">Location Name</h2>
         <img id="location-image" src="" alt="Location Image">
+    </div>
+
+    <!-- Radius Setter UI (Pops up above Discover button) -->
+    <div id="radius-ui">
+        <img src="miles-bg.svg" alt="Miles Background" class="radius-bg">
+        <div class="radius-input-container">
+            <input type="number" id="radius-input" value="1" min="0.1" step="0.1">
+        </div>
     </div>
 
     <!-- Random Button -->
@@ -419,7 +485,14 @@
                 lng: -0.09589475851021564,
                 audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3",
                 image: "https://i.postimg.cc/c1fhHHtk/5.jpg"
-            }
+            },
+             {
+                name: "one million pound lunch from whole foods",
+                lat: 51.505250,
+                lng: -0.180972,
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+                image: "https://i.postimg.cc/zB7FBw0Y/Ken-Pond.png"
+            },
         ];
 
         let currentAudio = null;
@@ -498,85 +571,183 @@
             }
         });
 
+        // --- UPDATED DISCOVER RADIUS TOOL LOGIC ---
         let currentRandomPin = null;
+        let isDiscoverMode = false;
+        let discoverCircle = null;
+        let discoverCenter = null;
+        const radiusUi = document.getElementById('radius-ui');
+        const radiusInput = document.getElementById('radius-input');
 
         document.getElementById('random-btn').addEventListener('click', () => {
-            if (currentRandomPin) {
-                map.removeLayer(currentRandomPin);
-            }
-
-            const centerLat = 51.505;
-            const centerLng = -0.120;
-            const maxRadius = 0.1;
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.sqrt(Math.random()) * maxRadius;
-
-            const randomLat = (centerLat + distance * Math.cos(angle)).toFixed(4);
-            const randomLng = (centerLng + distance * Math.sin(angle) * 1.6).toFixed(4);
-
-            currentRandomPin = L.marker([randomLat, randomLng], { icon: discoveryIcon }).addTo(map);
-
-            map.flyTo([randomLat, randomLng], hoverZoom, {
-                animate: true,
-                duration: 3
-            });
-
-            currentRandomPin.bindPopup(`
-                <strong>Random Discovery</strong><br>
-                Lat: ${randomLat}<br>
-                Lng: ${randomLng}
-            `, {
-                className: 'floating-text-popup',
-                offset: [0, -30]
-            }).openPopup();
-
-            currentRandomPin.on('popupclose', () => {
+            if (!isDiscoverMode) {
+                // TURN MODE ON: Show UI and draw the circle outline
+                isDiscoverMode = true;
+                radiusUi.style.display = 'flex';
+                discoverCenter = map.getCenter();
+                const radiusMiles = parseFloat(radiusInput.value) || 1;
+                const radiusMeters = radiusMiles * 1609.34;
+                
+                discoverCircle = L.circle(discoverCenter, {
+                    color: '#0000ff',
+                    fill: false, /* Removes the blue fill completely */
+                    weight: 2
+                }).addTo(map);
+                
+                radiusInput.focus(); 
+            } else {
+                // BUTTON CLICKED AGAIN: Execute the jump!
                 if (currentRandomPin) {
                     map.removeLayer(currentRandomPin);
-                    currentRandomPin = null;
                 }
-            });
 
-            imagePanel.style.opacity = 0;
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
+                const radiusMiles = parseFloat(radiusInput.value) || 1;
+                const radiusMeters = radiusMiles * 1609.34;
+                
+                const r = radiusMeters * Math.sqrt(Math.random());
+                const theta = Math.random() * 2 * Math.PI;
+
+                const dy = r * Math.sin(theta);
+                const dx = r * Math.cos(theta);
+                
+                const latOffset = dy / 111320;
+                const lngOffset = dx / (111320 * Math.cos(discoverCenter.lat * Math.PI / 180));
+                
+                const randomLat = discoverCenter.lat + latOffset;
+                const randomLng = discoverCenter.lng + lngOffset;
+
+                currentRandomPin = L.marker([randomLat, randomLng], { icon: discoveryIcon }).addTo(map);
+
+                map.flyTo([randomLat, randomLng], hoverZoom, {
+                    animate: true,
+                    duration: 3
+                });
+
+                currentRandomPin.bindPopup(`
+                    <strong>Random Discovery</strong><br>
+                    Lat: ${randomLat.toFixed(4)}<br>
+                    Lng: ${randomLng.toFixed(4)}
+                `, {
+                    className: 'floating-text-popup',
+                    offset: [0, -30]
+                }).openPopup();
+
+                currentRandomPin.on('popupclose', () => {
+                    if (currentRandomPin) {
+                        map.removeLayer(currentRandomPin);
+                        currentRandomPin = null;
+                    }
+                });
+                
+                exitDiscoverMode(); // Closes UI and removes circle
             }
         });
 
-        map.on('click', () => {
-            imagePanel.style.opacity = 0;
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
+        function exitDiscoverMode() {
+            isDiscoverMode = false;
+            radiusUi.style.display = 'none';
+            if (discoverCircle) {
+                map.removeLayer(discoverCircle);
+                discoverCircle = null;
             }
-            map.flyTo(defaultCenter, defaultZoom, {
-                animate: true,
-                duration: 3
-            });
+        }
+
+        map.on('click', (e) => {
+            if (isDiscoverMode && discoverCircle) {
+                discoverCenter = e.latlng;
+                discoverCircle.setLatLng(discoverCenter);
+            } else {
+                imagePanel.style.opacity = 0;
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                map.flyTo(defaultCenter, defaultZoom, {
+                    animate: true,
+                    duration: 3
+                });
+            }
         });
 
-        const gpxRoute = new L.GPX('BensCommutev1.gpx', {
-            async: true,
-            polyline_options: {
-                color: '#0000ff',
-                weight: 3,
-                opacity: 0.85,
-                lineCap: 'round'
-            },
-            marker_options: {
-                startIconUrl: 'bluedot.svg',
-                endIconUrl: 'bluedot.svg',
-                iconSize: [25, 25],
-                iconAnchor: [12.5, 12.5],
-                shadowUrl: null
+        radiusInput.addEventListener('input', () => {
+            if (isDiscoverMode && discoverCircle) {
+                const radiusMiles = parseFloat(radiusInput.value) || 0;
+                const radiusMeters = radiusMiles * 1609.34;
+                discoverCircle.setRadius(radiusMeters);
             }
-        }).addTo(map);
+        });
+
+        // --- MULTIPLE GPX FILE LOADER ---
+        const gpxFiles = ['BensCommutev1.gpx', '4th Oct_Ken Pond.gpx'];
+        
+        let loadedGpxCount = 0;
+        const allRoutesGroup = L.featureGroup().addTo(map);
 
         const revealRoutesButton = document.getElementById('reveal-routes-btn');
         let routePaths = [];
         let routeMarkers = [];
         let routesRevealed = false;
+
+        gpxFiles.forEach(file => {
+            new L.GPX(file, {
+                async: true,
+                polyline_options: {
+                    color: '#0000ff',
+                    weight: 3,
+                    opacity: 0.85,
+                    lineCap: 'round'
+                },
+                marker_options: {
+                    startIconUrl: 'bluedot.svg',
+                    endIconUrl: 'bluedot.svg',
+                    iconSize: [25, 25],
+                    iconAnchor: [12.5, 12.5],
+                    shadowUrl: null
+                }
+            }).on('loaded', function (e) {
+                loadedGpxCount++;
+                
+                if (loadedGpxCount === gpxFiles.length) {
+                    map.fitBounds(allRoutesGroup.getBounds(), { animate: false });
+
+                    requestAnimationFrame(() => {
+                        routeMarkers = [...document.querySelectorAll('.leaflet-marker-icon[src$="bluedot.svg"]')];
+                        routeMarkers.forEach(marker => {
+                            marker.style.opacity = '0';
+                            marker.style.transition = 'opacity 0.5s ease';
+                        });
+
+                        routePaths = [...document.querySelectorAll('.leaflet-overlay-pane path')];
+
+                        let totalRouteLength = 0;
+                        routePaths.forEach(routePath => {
+                            totalRouteLength += routePath.getTotalLength();
+                        });
+
+                        const TOTAL_ANIMATION_TIME = 3;
+                        let accumulatedDelay = 0;
+
+                        routePaths.forEach(routePath => {
+                            const routeLength = routePath.getTotalLength();
+                            routePath.dataset.totalLength = routeLength;
+
+                            routePath.style.strokeDasharray = routeLength;
+                            routePath.style.strokeDashoffset = routeLength;
+                            routePath.style.opacity = '0';
+
+                            const segmentDuration = (routeLength / totalRouteLength) * TOTAL_ANIMATION_TIME;
+
+                            routePath.dataset.drawTransition = `stroke-dashoffset ${segmentDuration}s linear ${accumulatedDelay}s, opacity 0.2s ease`;
+                            routePath.dataset.hideTransition = `stroke-dashoffset 1s ease 0s, opacity 1s ease`;
+
+                            accumulatedDelay += segmentDuration;
+                        });
+
+                        revealRoutesButton.disabled = false;
+                    });
+                }
+            }).addTo(allRoutesGroup);
+        });
 
         revealRoutesButton.addEventListener('click', () => {
             routesRevealed = !routesRevealed;
@@ -599,46 +770,6 @@
             }
         });
 
-        gpxRoute.on('loaded', function (e) {
-            map.fitBounds(e.target.getBounds(), { animate: false });
-
-            requestAnimationFrame(() => {
-                routeMarkers = [...document.querySelectorAll('.leaflet-marker-icon[src$="bluedot.svg"]')];
-                routeMarkers.forEach(marker => {
-                    marker.style.opacity = '0';
-                    marker.style.transition = 'opacity 0.5s ease';
-                });
-
-                routePaths = [...document.querySelectorAll('.leaflet-overlay-pane path')];
-
-                let totalRouteLength = 0;
-                routePaths.forEach(routePath => {
-                    totalRouteLength += routePath.getTotalLength();
-                });
-
-                const TOTAL_ANIMATION_TIME = 3;
-                let accumulatedDelay = 0;
-
-                routePaths.forEach(routePath => {
-                    const routeLength = routePath.getTotalLength();
-                    routePath.dataset.totalLength = routeLength;
-
-                    routePath.style.strokeDasharray = routeLength;
-                    routePath.style.strokeDashoffset = routeLength;
-                    routePath.style.opacity = '0';
-
-                    const segmentDuration = (routeLength / totalRouteLength) * TOTAL_ANIMATION_TIME;
-
-                    routePath.dataset.drawTransition = `stroke-dashoffset ${segmentDuration}s linear ${accumulatedDelay}s, opacity 0.2s ease`;
-                    routePath.dataset.hideTransition = `stroke-dashoffset 1s ease 0s, opacity 1s ease`;
-
-                    accumulatedDelay += segmentDuration;
-                });
-
-                revealRoutesButton.disabled = false;
-            });
-        });
-
         // --- SUN & MOON MATH LOGIC ---
         const skyDome = document.getElementById('sky-dome');
         const domeGraphic = document.getElementById('dome-graphic');
@@ -654,10 +785,9 @@
         let moonActive = false;
 
         document.getElementById('toggle-sun-btn').addEventListener('click', () => {
-            sunActive = !sunActive; // Toggle the state (On/Off)
+            sunActive = !sunActive; 
             
             if (sunActive) {
-                // If turning Sun ON, force Moon OFF so they don't overlap
                 moonActive = false;
                 moonAltBox.style.display = 'none';
 
@@ -673,24 +803,21 @@
 
                 skyDome.style.display = 'block';
                 celestialPointer.style.display = 'block';
-                celestialPointer.style.backgroundColor = '#FFD700';
+                celestialPointer.style.backgroundColor = '#FFFFFF'; /* Pure White */
                 celestialPointer.style.transform = `translate(-50%, -100%) rotate(${compassAngle}deg)`;
                 
-                // Show ONLY the number and degree symbol next to the button
                 sunAltBox.innerHTML = `${altitudeDegrees}&deg;`;
                 sunAltBox.style.display = 'block';
             } else {
-                // If turning Sun OFF, hide everything
                 skyDome.style.display = 'none';
                 sunAltBox.style.display = 'none';
             }
         });
 
         document.getElementById('toggle-moon-btn').addEventListener('click', () => {
-            moonActive = !moonActive; // Toggle the state (On/Off)
+            moonActive = !moonActive; 
             
             if (moonActive) {
-                // If turning Moon ON, force Sun OFF
                 sunActive = false;
                 sunAltBox.style.display = 'none';
 
@@ -706,14 +833,12 @@
 
                 skyDome.style.display = 'block';
                 celestialPointer.style.display = 'block';
-                celestialPointer.style.backgroundColor = '#C0C0C0';
+                celestialPointer.style.backgroundColor = '#C0C0C0'; /* Silver */
                 celestialPointer.style.transform = `translate(-50%, -100%) rotate(${compassAngle}deg)`;
                 
-                // Show ONLY the number and degree symbol next to the button
                 moonAltBox.innerHTML = `${altitudeDegrees}&deg;`;
                 moonAltBox.style.display = 'block';
             } else {
-                // If turning Moon OFF, hide everything
                 skyDome.style.display = 'none';
                 moonAltBox.style.display = 'none';
             }
